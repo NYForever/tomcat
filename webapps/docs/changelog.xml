@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+
+  <!-- DTD is used to validate changelog structure at build time. BZ 64931. -->
+
+  <!ELEMENT document (project?, properties, body)>
+  <!ATTLIST document url CDATA #REQUIRED>
+
+  <!-- body and title are used both in project.xml and in this document -->
+  <!ELEMENT body ANY>
+  <!ELEMENT title (#PCDATA)>
+
+  <!-- Elements of project.xml -->
+  <!ELEMENT project (title, logo, body)>
+  <!ATTLIST project name CDATA #REQUIRED>
+  <!ATTLIST project href CDATA #REQUIRED>
+
+  <!ELEMENT logo (#PCDATA)>
+  <!ATTLIST logo href CDATA #REQUIRED>
+
+  <!ELEMENT menu (item+)>
+  <!ATTLIST menu name CDATA #REQUIRED>
+
+  <!ELEMENT item EMPTY>
+  <!ATTLIST item name CDATA #REQUIRED>
+  <!ATTLIST item href CDATA #REQUIRED>
+
+  <!-- Elements of this document -->
+  <!ELEMENT properties (author*, title, no-comments) >
+  <!ELEMENT author (#PCDATA)>
+  <!ATTLIST author email CDATA #IMPLIED>
+  <!ELEMENT no-comments EMPTY>
+
+  <!ELEMENT section (subsection)*>
+  <!ATTLIST section name CDATA #REQUIRED>
+  <!ATTLIST section rtext CDATA #IMPLIED>
+
+  <!ELEMENT subsection (changelog+)>
+  <!ATTLIST subsection name CDATA #REQUIRED>
+
+  <!ELEMENT changelog (add|update|fix|scode|docs|design)*>
+  <!ELEMENT add ANY>
+  <!ELEMENT update ANY>
+  <!ELEMENT fix ANY>
+  <!ELEMENT scode ANY>
+  <!ELEMENT docs ANY>
+  <!ELEMENT design ANY>
+
+  <!ELEMENT bug (#PCDATA)>
+  <!ELEMENT rev (#PCDATA)>
+  <!ELEMENT pr (#PCDATA)>
+
+  <!-- Random HTML markup tags. Add more here as needed. -->
+  <!ELEMENT a (#PCDATA)>
+  <!ATTLIST a href CDATA #REQUIRED>
+  <!ATTLIST a rel CDATA #IMPLIED>
+
+  <!ELEMENT b (#PCDATA)>
+  <!ELEMENT code (#PCDATA)>
+  <!ELEMENT em (#PCDATA)>
+  <!ELEMENT strong (#PCDATA)>
+  <!ELEMENT tt (#PCDATA)>
+]>
+<?xml-stylesheet type="text/xsl" href="tomcat-docs.xsl"?>
+<document url="changelog.html">
+
+  &project;
+
+  <properties>
+    <title>Changelog</title>
+    <no-comments />
+  </properties>
+
+<body>
+<!--
+  Subsection ordering:
+  General, Catalina, Coyote, Jasper, Cluster, WebSocket, Web applications,
+  Extras, Tribes, jdbc-pool, Other
+
+  Item Ordering:
+
+  Fixes having an issue number are sorted by their number, ascending.
+
+  There is no ordering by add/update/fix/scode/docs/design.
+
+  Other fixed issues are added to the end of the list, chronologically.
+  They eventually become mixed with the numbered issues (i.e., numbered
+  issues do not "pop up" wrt. others).
+-->
+<section name="Tomcat 11.0.0-M1 (markt)" rtext="in development">
+  <subsection name="General">
+    <changelog>
+      <scode>
+        This release contains all of the changes up to and including those in
+        Apache Tomcat 10.1.1 plus the additional changes listed below. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>66029</bug>: Add a configuration option to allow bloom filters used
+        to index JAR files to be retained for the lifetime of the web
+        application. Prior to this addition, the indexes were always flushed by
+        the periodic calls to <code>WebResourceRoot.gc()</code>. As part of this
+        addition, configuration of archive indexing moves from
+        <code>Context</code> to <code>WebResourceRoot</code>. Based on a patch
+        provided by Rahul Jaisimha. (markt)
+      </add>
+      <fix>
+        <bug>66330</bug>: Correct a regression introduced when fixing
+        <bug>62897</bug> that meant any value configured for
+        <code>skipMemoryLeakChecksOnJvmShutdown</code> on the
+        <code>Context</code> was ignored and the default was always used.
+        (markt)
+      </fix>
+      <fix>
+        <bug>66331</bug>: Fix a regression in refactoring for <code>Stack</code>
+        on the <code>SystemLogHandler</code> which caught incorrect exception.
+        (lihan)
+      </fix>
+      <fix>
+        <bug>66338</bug>: Fix a regression that caused a nuance in refactoring
+        for <code>ErrorReportValve</code>. (lihan)
+      </fix>
+      <fix>
+        Escape values used to construct output for the
+        <code>JsonErrorReportValve</code> to ensure that it always outputs valid
+        JSON. (markt)
+      </fix>
+      <fix>
+        Correct the default implementation of
+        <code>HttpServletRequest.isTrailerFieldsReady()</code> to return
+        <code>true</code> so it is consistent with the default implementation of
+        <code>HttpServletRequest.getTrailerFields()</code> and with the Servlet
+        API provided by the Jakarta EE project. (markt)
+      </fix>
+      <fix>
+        Refactor <code>WebappLoader</code> so it only has a runtime dependency
+        on the migration tool for Jakarta EE if configured to use the converter
+        as classes are loaded. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct the date format used with the expires attribute of HTTP cookies.
+        A single space rather than a single dash should be used to separate the
+        day, month and year components to be compliant with RFC 6265. (markt)
+      </fix>
+      <add>
+        Include the name of the current stream state in the error message when a
+        stream is cancelled due to an attempt to write to the stream when it is
+        in a state that does not permit writes. (markt)
+      </add>
+      <scode>
+        NIO writes never return -1 so refactor <code>CLOSED_NIO_CHANNEL</code>
+        not to do so and remove checks for this return value. Based on
+        <pr>562</pr> by tianshuang. (markt)
+      </scode>
+      <scode>
+        Remove unnecessary code that exposed the <code>asyncTimeout</code> to
+        components that never used it. (markt)
+      </scode>
+      <fix>
+        Ensure that all <code>MessageBytes</code> conversions to byte arrays are
+        valid for the configured character set and throw an exception if not.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66294</bug>: Make the use of a privileged block to obtain the
+        thread context class loader added to address <bug>62080</bug> optional
+        and disabled by default. This is now controlled by the
+        <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
+        property. (markt)
+      </fix>
+      <fix>
+        <bug>66317</bug>: Fix for Lambda coercion security manager missing
+        privileges. Based on pull request #557 by Isaac Rivera Rivas (lihan)
+      </fix>
+      <fix>
+        <bug>66325</bug>: Fix concurrency issue in evaluation of expression
+        language containing lambda expressions. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.3.2. (markt)
+      </update>
+      <fix>
+        <bug>66323</bug>: Move module start up parameters from
+        <code>JDK_JAVA_OPTIONS</code> to <code>JAVA_OPTS</code> now that the
+        minimum Java version is 11 and these options are always required.
+        (markt)
+      </fix>
+      <add>
+        Improvements to Chinese translations. Contributed by DigitalCat and
+        lihan. (markt)
+      </add>
+      <add>
+        Improvements to French translations. Contributed by Mathieu Bouchard.
+        (markt)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (markt)
+      </add>
+      <add>
+        Improvements to Spanish translations. (markt)
+      </add>
+      <fix>
+        Correct a regression in the removal of the APR connector that broke
+        Graal native image support. Pull request <pr>564</pr> provided by
+        Sébastien Deleuze. (markt)
+      </fix>
+      <update>
+        Update the packaged version of the Apache Tomcat Native Library to 2.0.2
+        to pick up the Windows binaries built with with OpenSSL 3.0.7. (markt)
+      </update>
+      <update>
+        Update the packaged version of the Apache Tomcat Migration Tool for
+        Jakarta EE to 1.0.5. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+</body>
+</document>
+
+
