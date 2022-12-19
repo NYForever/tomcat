@@ -38,15 +38,34 @@ Bootstrap 完成了两项工作: 创建类加载器和调用 Catalina 的方法�
 
 
 
-类加载顺序
+### 类加载顺序
 委托模型
 Bootstrap：该加载器用于 JVM 加载核心类，如 java.lang.*，java.io.*
 Extension：而 Extension 类加载器加载的是不需要指定环境变量的类，这些类位于:$JAVA_HOME/jre/lib/ext
 System：此类加载器用于加载 CLASSPATH 中指定的 JAR 和类，还用于加载入口函数类(仅含有 main()方法的类)，它还是上面没有覆盖到的类的加载器。
 
-为什么tomcat要自定义类加载器
+### 为什么tomcat要自定义类加载器
 程序开发人员和部署人员要决定在哪里放置类和资源文件，以便它们可以被网络程序使用
 对于某个网络程序所特有的类和资源，这些未包装的类和资源放置在你的网络程序 档案/WEB-INF/classes 目录下面，或者，包含这些类和资源的 JAR 文件放置在你的 网络程序档案/WEB-INF/lib 目录下面; 对于必须被所有网络程序共享的类和资源，未包装的这些类和资源放置在 $CATALINA_HOME/shared/classes 下面，或者，包含这些类和资源的 JAR 文件放 置在$CATALINA_HOME/shared/lib 下面。
+
+### Servlet
+
+DefaultServlet
+
+
+### Value
+
+Value可以存在于容器之中(Engin、Host、Context)
+
+AccessLogValve：可以记录客户端访问日志
+RemoteAddrValve：可以根据远程客户的 IP 地址决定是否接受客户的请求
+
+
+### 问题
+1. 连接池参数调优
+2. springboot如何集成tomcat
+
+
 
 
 参考资料：docs/精通Tomcat：Java Web应用开发、框架分析与组件配置、系统集成与案例实战.pdf
